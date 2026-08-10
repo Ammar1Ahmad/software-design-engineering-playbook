@@ -1,29 +1,101 @@
 # 02 — LFU Cache
 
-> **System & Software Design Quest — Level 2**
+<div align="center">
 
-A production-oriented implementation of a **Least Frequently Used (LFU) Cache** using a combination of **HashMaps and Doubly Linked Lists** to achieve **O(1) average time complexity** for both `get()` and `put()` operations.
+### Least Frequently Used Cache
+
+**System & Software Design Quest — Level 2**
+
+![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=openjdk)
+![Difficulty](https://img.shields.io/badge/Difficulty-Hard-red?style=flat-square)
+![Complexity](https://img.shields.io/badge/get%2Fput-O(1)-success?style=flat-square)
+![Design](https://img.shields.io/badge/Design-LFU-blue?style=flat-square)
+
+</div>
 
 ---
 
-## 📌 Problem Statement
+## 📚 Chapter Overview
 
-Design and implement a data structure that follows the constraints of a **Least Frequently Used (LFU) Cache**.
+This chapter designs an **LFU (Least Frequently Used) Cache** from first principles.
 
-The cache must support:
+The objective is not simply to produce working code.
 
-```java
-LFUCache(int capacity)
-int get(int key)
-void put(int key, int value)
+The objective is to understand:
+
+```text
+Problem
+   ↓
+Requirements
+   ↓
+Performance Constraints
+   ↓
+Data Structure Selection
+   ↓
+Design
+   ↓
+Algorithm
+   ↓
+Implementation
+   ↓
+Complexity
+   ↓
+Production Considerations
 ```
 
-The cache evicts an entry according to the following rules:
+The final implementation combines:
 
-1. Remove the key with the **lowest access frequency**.
-2. If multiple keys have the same frequency, remove the **least recently used (LRU)** key among them.
+```text
+HashMap
+    +
+Frequency Map
+    +
+Doubly Linked Lists
+    +
+Minimum Frequency Tracking
+```
 
-Both `get()` and `put()` must execute in:
+to achieve:
+
+```text
+get()  → O(1) average
+put()  → O(1) average
+```
+
+---
+
+# 1. Problem Statement
+
+Design and implement a data structure for a **Least Frequently Used (LFU) Cache**.
+
+The cache supports:
+
+```java
+LFUCache(int capacity);
+
+int get(int key);
+
+void put(int key, int value);
+```
+
+The eviction policy is:
+
+### Rule 1 — Frequency
+
+Evict the key with the **lowest usage frequency**.
+
+### Rule 2 — Recency
+
+If multiple keys have the same frequency, evict the **least recently used** key.
+
+Both:
+
+```text
+get()
+put()
+```
+
+must run in:
 
 ```text
 O(1) average time
@@ -31,600 +103,193 @@ O(1) average time
 
 ---
 
-# 🎯 Requirements
+# 2. Requirements
 
-## Functional Requirements
+## 2.1 Constructor
 
-### `LFUCache(capacity)`
+```java
+LFUCache(int capacity)
+```
 
-Initialize the cache with a positive capacity.
-
-### `get(key)`
-
-- Return the value if the key exists.
-- Return `-1` otherwise.
-- Increment the key's frequency.
-- Update its recency within the new frequency group.
-
-### `put(key, value)`
-
-- Insert a new key-value pair.
-- Update an existing key's value.
-- Increment frequency when an existing key is updated.
-- If the cache is full, evict the LFU key.
-- If multiple keys have the same frequency, evict the LRU key.
+Creates a cache with the specified capacity.
 
 ---
 
-# 🧠 Core Design Challenge
+## 2.2 `get(key)`
 
-An LFU cache is more complicated than an LRU cache.
-
-An LRU cache only needs to maintain:
+If the key exists:
 
 ```text
-Recency
+return value
 ```
 
-An LFU cache must maintain:
+and increase its frequency.
+
+If the key does not exist:
 
 ```text
-Frequency
-        +
-Recency within each frequency
+return -1
 ```
 
-For example:
-
-```text
-Frequency 1
-┌─────────────────────────┐
-│ 3 → 5 → 7               │
-│ MRU         LRU         │
-└─────────────────────────┘
-
-Frequency 2
-┌─────────────────────────┐
-│ 8 → 4                   │
-│ MRU    LRU              │
-└─────────────────────────┘
-
-Frequency 3
-┌─────────────────────────┐
-│ 9                       │
-└─────────────────────────┘
-```
-
-If the cache becomes full, we first find the smallest frequency:
-
-```text
-minFreq = 1
-```
-
-Then remove the LRU entry from that frequency list.
+An accessed key also becomes the **most recently used key inside its new frequency group**.
 
 ---
 
-# 🏗️ Architecture
+## 2.3 `put(key, value)`
 
-The implementation uses **three cooperating components**.
+If the key already exists:
 
 ```text
-                    LFUCache
-                       │
-          ┌────────────┼────────────┐
-          │            │            │
-          ▼            ▼            ▼
-       keyMap       freqMap      minFreq
-          │            │
-          │            │
-      key → Node   freq → DLL
-                       │
-                       ▼
-                Doubly Linked List
-                       │
-                       ▼
-                    Node
+update value
+increase frequency
+update recency
+```
+
+If the key does not exist:
+
+```text
+create key
+frequency = 1
+```
+
+If the cache is full:
+
+```text
+evict LFU
+```
+
+If there is a frequency tie:
+
+```text
+evict LRU
 ```
 
 ---
 
-# 🔹 1. Key Map
+# 3. The Real Design Problem
+
+At first glance, LFU sounds simple:
+
+> "Just count how many times each key is used."
+
+But the requirement is stronger.
+
+We need to answer all of these questions in O(1):
+
+```text
+1. Where is key X?
+2. What is X's frequency?
+3. Which frequency is the minimum?
+4. Which node is the LRU node in that frequency?
+5. How do we move a node to another frequency?
+```
+
+This is the actual design challenge.
+
+---
+
+# 4. Why a Single HashMap Is Not Enough
+
+A simple structure:
+
+```java
+HashMap<Integer, Node>
+```
+
+can answer:
+
+```text
+Where is key X?
+```
+
+in O(1).
+
+But it cannot efficiently answer:
+
+```text
+Which key has the smallest frequency?
+```
+
+or:
+
+```text
+Which key is the LRU among the keys
+having that frequency?
+```
+
+Searching all keys would take:
+
+```text
+O(n)
+```
+
+which violates the requirement.
+
+Therefore, we need more structure.
+
+---
+
+# 5. The Core Idea
+
+We divide the problem into independent responsibilities.
+
+```text
+┌─────────────────────────────────────┐
+│              LFUCache               │
+├─────────────────────────────────────┤
+│                                     │
+│ keyMap                              │
+│   ↓                                 │
+│ Find a key in O(1)                  │
+│                                     │
+│ freqMap                             │
+│   ↓                                 │
+│ Find a frequency group in O(1)      │
+│                                     │
+│ Doubly Linked List                  │
+│   ↓                                 │
+│ Maintain recency in O(1)            │
+│                                     │
+│ minFreq                             │
+│   ↓                                 │
+│ Find minimum frequency in O(1)      │
+│                                     │
+└─────────────────────────────────────┘
+```
+
+This is the central design.
+
+---
+
+# 6. Data Structures
+
+We use **four important concepts**.
+
+## 6.1 `keyMap`
 
 ```java
 HashMap<Integer, Node> keyMap;
 ```
 
-Purpose:
+Mapping:
 
 ```text
 key → Node
 ```
 
-This allows direct access to a cache entry.
-
 Example:
 
 ```text
-keyMap
+1 → Node(1, 100, freq=2)
 
-1 ─────► Node(key=1, value=100, freq=2)
+2 → Node(2, 200, freq=1)
 
-2 ─────► Node(key=2, value=200, freq=1)
-
-3 ─────► Node(key=3, value=300, freq=3)
+3 → Node(3, 300, freq=4)
 ```
 
-### Complexity
+### Purpose
 
-```text
-get(key) → O(1) average
-```
-
----
-
-# 🔹 2. Frequency Map
-
-```java
-HashMap<Integer, DoublyLinkedList> freqMap;
-```
-
-This maps each frequency to a doubly linked list.
-
-```text
-Frequency
-    │
-    ▼
-Doubly Linked List
-```
-
-Example:
-
-```text
-freqMap
-
-1 → [4 ⇄ 2 ⇄ 7]
-
-2 → [3 ⇄ 5]
-
-3 → [9]
-```
-
-Within each frequency list:
-
-```text
-Head
- ↓
-Most Recently Used
- ↓
-...
- ↓
-Least Recently Used
- ↓
-Tail
-```
-
-Therefore, when a frequency tie occurs, the LRU entry can be removed in O(1).
-
----
-
-# 🔹 3. Minimum Frequency
-
-```java
-private int minFreq;
-```
-
-`minFreq` stores the smallest frequency currently present in the cache.
-
-Example:
-
-```text
-freqMap:
-
-1 → [A, B]
-2 → [C]
-4 → [D]
-
-minFreq = 1
-```
-
-When eviction is required:
-
-```java
-freqMap.get(minFreq)
-```
-
-immediately identifies the frequency group from which the victim must be removed.
-
----
-
-# 🧩 Node Design
-
-Each cache entry is represented by:
-
-```java
-class Node {
-    int key;
-    int value;
-    int freq;
-    Node prev;
-    Node next;
-}
-```
-
-Each node stores:
-
-| Field | Purpose |
-|---|---|
-| `key` | Cache key |
-| `value` | Cached value |
-| `freq` | Number of uses |
-| `prev` | Previous node |
-| `next` | Next node |
-
-The `key` is stored inside the node because it is required when removing an evicted node from `keyMap`.
-
----
-
-# 🔗 Doubly Linked List
-
-Each frequency owns a separate doubly linked list.
-
-```text
-HEAD
- ↓
-[MRU]
- ↓
-[Node]
- ↓
-[Node]
- ↓
-[LRU]
- ↓
-TAIL
-```
-
-Dummy nodes are used:
-
-```text
-HEAD ⇄ Node ⇄ Node ⇄ TAIL
-```
-
-This eliminates special cases when inserting or removing nodes.
-
----
-
-# 🔄 Frequency Update
-
-Whenever a key is accessed:
-
-```text
-get(key)
-```
-
-or an existing key is updated:
-
-```text
-put(key, value)
-```
-
-its frequency increases.
-
-Suppose:
-
-```text
-Node A
-
-frequency = 2
-```
-
-Before:
-
-```text
-freq 2:
-
-HEAD → A → B → TAIL
-```
-
-After accessing A:
-
-```text
-frequency = 3
-```
-
-A must be moved from the frequency-2 list to the frequency-3 list.
-
-```text
-freq 2:
-
-HEAD → B → TAIL
-
-
-freq 3:
-
-HEAD → A → TAIL
-```
-
----
-
-# 🔥 Example Walkthrough
-
-Capacity:
-
-```text
-2
-```
-
----
-
-## Step 1
-
-```java
-put(1, 1);
-```
-
-New entries start with frequency `1`.
-
-```text
-freq 1:
-
-HEAD → [1] → TAIL
-
-minFreq = 1
-```
-
----
-
-## Step 2
-
-```java
-put(2, 2);
-```
-
-Both keys have frequency `1`.
-
-```text
-freq 1:
-
-HEAD → [2] → [1] → TAIL
-         MRU       LRU
-```
-
-Therefore:
-
-```text
-minFreq = 1
-```
-
----
-
-## Step 3
-
-```java
-get(1);
-```
-
-Key `1` moves from frequency `1` to frequency `2`.
-
-```text
-freq 1:
-
-HEAD → [2] → TAIL
-
-
-freq 2:
-
-HEAD → [1] → TAIL
-
-minFreq = 1
-```
-
----
-
-## Step 4
-
-```java
-put(3, 3);
-```
-
-Cache is full.
-
-The minimum frequency is:
-
-```text
-minFreq = 1
-```
-
-Frequency-1 list:
-
-```text
-HEAD → [2] → TAIL
-```
-
-Therefore key `2` is evicted.
-
-Then:
-
-```text
-freq 1:
-
-HEAD → [3] → TAIL
-
-freq 2:
-
-HEAD → [1] → TAIL
-```
-
----
-
-## Step 5
-
-```java
-get(3);
-```
-
-Key `3` moves:
-
-```text
-freq 1 → freq 2
-```
-
-Now:
-
-```text
-freq 2:
-
-HEAD → [3] → [1] → TAIL
-         MRU       LRU
-```
-
----
-
-## Step 6
-
-```java
-put(4, 4);
-```
-
-Cache is full.
-
-Both keys have frequency:
-
-```text
-2
-```
-
-Therefore we use the LRU rule.
-
-```text
-freq 2:
-
-HEAD → [3] → [1] → TAIL
-         MRU       LRU
-```
-
-Key `1` is the LRU entry.
-
-Therefore:
-
-```text
-Evict 1
-```
-
-Final cache:
-
-```text
-freq 1:
-
-HEAD → [4] → TAIL
-
-freq 2:
-
-HEAD → [3] → TAIL
-```
-
----
-
-# 📊 Data Structure Relationship
-
-The complete relationship can be visualized as:
-
-```text
-                         LFUCache
-                            │
-            ┌───────────────┴────────────────┐
-            │                                │
-            ▼                                ▼
-        keyMap                           freqMap
-            │                                │
-            │                         ┌──────┴──────┐
-            │                         │             │
-            ▼                         ▼             ▼
-          Node                    freq = 1      freq = 2
-            │                         │             │
-            │                         ▼             ▼
-            │                       DLL           DLL
-            │                         │             │
-            │                         ▼             ▼
-            │                    Node ⇄ Node   Node ⇄ Node
-            │
-            └────────────────────────────────────────
-```
-
----
-
-# ⚙️ Algorithm
-
-## `get(key)`
-
-```text
-1. Check keyMap.
-2. If key doesn't exist → return -1.
-3. Retrieve Node.
-4. Remove Node from current frequency list.
-5. Increase frequency.
-6. Add Node to the front of the new frequency list.
-7. Update minFreq if required.
-8. Return value.
-```
-
----
-
-## `put(key, value)`
-
-### Existing Key
-
-```text
-1. Find Node using keyMap.
-2. Update value.
-3. Increase frequency.
-4. Move Node to new frequency list.
-```
-
-### New Key
-
-```text
-1. Check whether cache is full.
-2. If full:
-      - Find minFreq.
-      - Get corresponding frequency list.
-      - Remove its LRU node.
-      - Remove key from keyMap.
-3. Create new Node.
-4. Set frequency = 1.
-5. Insert Node into frequency-1 list.
-6. Set minFreq = 1.
-7. Add Node to keyMap.
-```
-
----
-
-# ⏱️ Complexity Analysis
-
-| Operation | Time Complexity | Space Complexity |
-|---|---:|---:|
-| `get()` | O(1) average | O(1) |
-| `put()` | O(1) average | O(1) |
-| Frequency update | O(1) | O(1) |
-| Node insertion | O(1) | O(1) |
-| Node removal | O(1) | O(1) |
-| LFU eviction | O(1) | O(1) |
-| Overall Cache | — | O(capacity) |
-
-### Overall
-
-```text
-Time:  O(1) average
-Space: O(capacity)
-```
-
----
-
-# 💡 Why O(1)?
-
-The implementation avoids searching.
-
-### Finding a key
+Find a key immediately.
 
 ```java
 keyMap.get(key)
@@ -636,52 +301,108 @@ Average:
 O(1)
 ```
 
-### Finding its frequency list
+---
+
+# 7. Node
+
+Each cache entry is represented by a node.
 
 ```java
-freqMap.get(freq)
+class Node {
+
+    int key;
+    int value;
+    int freq;
+
+    Node prev;
+    Node next;
+}
 ```
 
-Average:
+Think of a node as:
 
 ```text
-O(1)
+┌─────────────────────────┐
+│          Node           │
+├─────────────────────────┤
+│ key                     │
+│ value                   │
+│ frequency               │
+│ previous node           │
+│ next node               │
+└─────────────────────────┘
 ```
 
-### Removing a node
+Why do we store `key` inside the node?
 
-Because every node contains:
+Because when we evict a node, we need to remove its key from:
 
 ```java
-prev
-next
+keyMap
 ```
 
-removal is:
+---
 
-```text
-O(1)
-```
+# 8. Frequency Map
 
-### Finding LFU frequency
+Now we solve the second problem.
 
-The variable:
+We create:
 
 ```java
-minFreq
+HashMap<Integer, DoublyLinkedList> freqMap;
 ```
 
-already stores the minimum frequency.
-
-Therefore:
+Mapping:
 
 ```text
-No frequency scan required.
+frequency → linked list
 ```
 
-### Finding LRU within the frequency
+For example:
 
-The LRU node is:
+```text
+freq = 1
+    ↓
+[7] ⇄ [4] ⇄ [2]
+
+freq = 2
+    ↓
+[8] ⇄ [5]
+
+freq = 3
+    ↓
+[9]
+```
+
+Each frequency has its own list.
+
+---
+
+# 9. Why a Linked List Per Frequency?
+
+Suppose:
+
+```text
+Frequency = 2
+
+HEAD → A → B → C → TAIL
+```
+
+The ordering means:
+
+```text
+A = MRU
+C = LRU
+```
+
+If we need to evict from frequency 2:
+
+```text
+remove C
+```
+
+We can immediately access:
 
 ```java
 tail.prev
@@ -690,114 +411,949 @@ tail.prev
 Therefore:
 
 ```text
-No list traversal required.
+O(1)
 ```
+
+No traversal.
 
 ---
 
-# 🧠 Key Design Insight
+# 10. Doubly Linked List
 
-The central idea of this solution is:
+Every frequency group uses:
 
 ```text
-HashMap
-   ↓
-O(1) Key Lookup
-
-+
-
-Frequency Map
-   ↓
-O(1) Frequency Group Lookup
-
-+
-
-Doubly Linked List
-   ↓
-O(1) Recency Management
-
-+
-
-minFreq
-   ↓
-O(1) LFU Identification
+HEAD ⇄ Node ⇄ Node ⇄ Node ⇄ TAIL
 ```
 
-Together:
+The ordering is:
 
 ```text
-O(1) get()
-O(1) put()
+HEAD
+  ↓
+MRU
+  ↓
+...
+  ↓
+LRU
+  ↓
+TAIL
 ```
 
----
-
-# 🆚 LRU vs LFU
-
-| Feature | LRU | LFU |
-|---|---|---|
-| Primary eviction rule | Least recently used | Least frequently used |
-| Tie breaker | Not required | LRU |
-| Frequency tracking | ❌ | ✅ |
-| Recency tracking | ✅ | ✅ |
-| HashMap | ✅ | ✅ |
-| Doubly Linked List | ✅ | ✅ |
-| Complexity | O(1) average | O(1) average |
-| Design complexity | Medium | High |
-
----
-
-# 🏗️ Design Principles
-
-This solution demonstrates:
-
-### Encapsulation
-
-Cache internals remain private:
+Therefore:
 
 ```java
-private HashMap<Integer, Node> keyMap;
-private HashMap<Integer, DoublyLinkedList> freqMap;
+head.next
+```
+
+is the MRU node.
+
+And:
+
+```java
+tail.prev
+```
+
+is the LRU node.
+
+---
+
+# 11. Why Doubly Linked List?
+
+Consider:
+
+```text
+A ⇄ B ⇄ C
+```
+
+If we need to remove `B`, we already know:
+
+```text
+B.prev = A
+B.next = C
+```
+
+So we can directly connect:
+
+```text
+A.next = C
+C.prev = A
+```
+
+No traversal is required.
+
+Therefore:
+
+```text
+remove(node) = O(1)
+```
+
+A singly linked list would not provide the previous node directly.
+
+---
+
+# 12. Dummy Head and Tail
+
+Instead of handling special cases:
+
+```text
+empty list
+one node
+first node
+last node
+```
+
+we use dummy nodes.
+
+```text
+HEAD ⇄ A ⇄ B ⇄ C ⇄ TAIL
+```
+
+The dummy nodes are not real cache entries.
+
+They simply simplify pointer manipulation.
+
+---
+
+# 13. Minimum Frequency
+
+We maintain:
+
+```java
+private int minFreq;
+```
+
+Example:
+
+```text
+freq 1 → [A, B]
+freq 2 → [C]
+freq 4 → [D]
+
+minFreq = 1
+```
+
+When eviction is required:
+
+```java
+freqMap.get(minFreq)
+```
+
+immediately gives us the LFU frequency group.
+
+Therefore:
+
+```text
+No frequency scanning.
 ```
 
 ---
 
-### Separation of Responsibilities
+# 14. Complete Architecture
 
-Different structures have different responsibilities:
+```mermaid
+flowchart TD
+
+    A[LFUCache]
+
+    A --> B[keyMap]
+    A --> C[freqMap]
+    A --> D[minFreq]
+
+    B --> E[Key → Node]
+
+    C --> F[Frequency → DoublyLinkedList]
+
+    F --> G[Frequency 1]
+    F --> H[Frequency 2]
+    F --> I[Frequency 3]
+
+    G --> J[MRU ⇄ ... ⇄ LRU]
+    H --> K[MRU ⇄ ... ⇄ LRU]
+    I --> L[MRU ⇄ ... ⇄ LRU]
+```
+
+---
+
+# 15. Important Invariant
+
+The entire implementation depends on maintaining this invariant:
+
+> **Every node exists in exactly one frequency list, and its `freq` field matches that list's frequency.**
+
+For example:
+
+```text
+Node A:
+
+freq = 3
+```
+
+must exist inside:
+
+```text
+freqMap.get(3)
+```
+
+and not:
+
+```text
+freqMap.get(1)
+freqMap.get(2)
+```
+
+This invariant makes the system predictable.
+
+---
+
+# 16. `get()` Theory
+
+Suppose:
+
+```java
+get(5)
+```
+
+We perform:
+
+```text
+Step 1
+   ↓
+Find key in keyMap
+
+Step 2
+   ↓
+Retrieve Node
+
+Step 3
+   ↓
+Remove from current frequency list
+
+Step 4
+   ↓
+Increase frequency
+
+Step 5
+   ↓
+Insert into new frequency list
+
+Step 6
+   ↓
+Return value
+```
+
+---
+
+# 17. `get()` Implementation
+
+```java
+public int get(int key) {
+
+    if (!keyMap.containsKey(key)) {
+        return -1;
+    }
+
+    Node node = keyMap.get(key);
+
+    updateFrequency(node);
+
+    return node.value;
+}
+```
+
+### Mapping theory → code
+
+```text
+Does key exist?
+       ↓
+keyMap.containsKey(key)
+
+Find node
+       ↓
+keyMap.get(key)
+
+Update frequency
+       ↓
+updateFrequency(node)
+
+Return data
+       ↓
+node.value
+```
+
+The entire operation remains:
+
+```text
+O(1) average
+```
+
+---
+
+# 18. `put()` Has Two Cases
+
+Every `put()` operation belongs to one of two categories.
+
+```text
+                 put(key,value)
+                       │
+              ┌────────┴────────┐
+              │                 │
+           Exists            New Key
+              │                 │
+         Update value       Check capacity
+              │                 │
+        Increase freq       Evict if full
+              │                 │
+        Update recency      Create Node
+                                │
+                           freq = 1
+                                │
+                         Insert into list
+```
+
+---
+
+# 19. Existing Key
+
+Suppose:
+
+```java
+put(5, 100);
+```
+
+and key `5` already exists.
+
+We:
+
+```text
+1. Find node
+2. Update value
+3. Increase frequency
+4. Move node to new frequency group
+```
+
+Code:
+
+```java
+if (keyMap.containsKey(key)) {
+
+    Node node = keyMap.get(key);
+
+    node.value = value;
+
+    updateFrequency(node);
+}
+```
+
+---
+
+# 20. New Key
+
+If the key does not exist:
+
+```text
+Create Node
+frequency = 1
+```
+
+Why frequency 1?
+
+Because the insertion itself counts as the first use according to the problem definition.
+
+Then:
 
 ```text
 keyMap
-    → key lookup
+   ↓
+key → Node
 
 freqMap
-    → frequency organization
+   ↓
+1 → Node
+```
 
-DoublyLinkedList
-    → recency management
+And:
 
-minFreq
-    → minimum frequency tracking
+```java
+minFreq = 1;
 ```
 
 ---
 
-### Composition
+# 21. Eviction
 
-`LFUCache` is composed of multiple data structures:
+Suppose:
 
 ```text
-LFUCache
- ├── HashMap
- ├── HashMap
- └── DoublyLinkedLists
+capacity = 3
 ```
 
-This is a good example of **composition over unnecessary inheritance**.
+and:
+
+```text
+freq 1 → [A, B]
+freq 2 → [C]
+freq 4 → [D]
+```
+
+The cache is full.
+
+We first check:
+
+```java
+minFreq
+```
+
+which is:
+
+```text
+1
+```
+
+Then:
+
+```java
+freqMap.get(1)
+```
+
+gives:
+
+```text
+[A, B]
+```
+
+Since:
+
+```text
+A = MRU
+B = LRU
+```
+
+we remove:
+
+```text
+B
+```
+
+using:
+
+```java
+list.removeLast();
+```
 
 ---
 
-# 🎨 UML Class Diagram
+# 22. Why `minFreq` Matters
+
+Without:
+
+```java
+minFreq
+```
+
+we might need to perform:
+
+```text
+1
+2
+3
+4
+5
+...
+n
+```
+
+frequency searches.
+
+That would potentially become:
+
+```text
+O(n)
+```
+
+Instead:
+
+```java
+freqMap.get(minFreq)
+```
+
+gives the required frequency group immediately.
+
+---
+
+# 23. Frequency Update
+
+This is the most important method in the implementation:
+
+```java
+private void updateFrequency(Node node)
+```
+
+The process is:
+
+```text
+Current frequency
+       ↓
+Remove from old list
+       ↓
+Check minFreq
+       ↓
+Increase frequency
+       ↓
+Get new frequency list
+       ↓
+Insert at front
+```
+
+---
+
+# 24. Step 1 — Read Frequency
+
+```java
+int freq = node.freq;
+```
+
+Suppose:
+
+```text
+node.freq = 2
+```
+
+We remember:
+
+```text
+old frequency = 2
+```
+
+---
+
+# 25. Step 2 — Find Old Frequency List
+
+```java
+DoublyLinkedList list = freqMap.get(freq);
+```
+
+This gives:
+
+```text
+freqMap
+   ↓
+frequency 2
+   ↓
+[Node A] ⇄ [Node B]
+```
+
+---
+
+# 26. Step 3 — Remove Node
+
+```java
+list.remove(node);
+```
+
+The node leaves its old frequency group.
+
+Because we have:
+
+```text
+prev
+next
+```
+
+the removal is:
+
+```text
+O(1)
+```
+
+---
+
+# 27. Step 4 — Update `minFreq`
+
+```java
+if (freq == minFreq && list.size == 0) {
+    minFreq++;
+}
+```
+
+This condition is important.
+
+Suppose:
+
+```text
+minFreq = 2
+```
+
+and frequency 2 becomes empty.
+
+Then frequency 2 no longer exists.
+
+Therefore:
+
+```text
+minFreq = 3
+```
+
+---
+
+# 28. Step 5 — Increase Frequency
+
+```java
+node.freq++;
+```
+
+For example:
+
+```text
+2 → 3
+```
+
+The node now belongs to:
+
+```text
+frequency 3
+```
+
+---
+
+# 29. Step 6 — Find New Frequency List
+
+```java
+DoublyLinkedList newList =
+        freqMap.getOrDefault(
+                node.freq,
+                new DoublyLinkedList()
+        );
+```
+
+If frequency 3 already exists:
+
+```text
+use it
+```
+
+Otherwise:
+
+```text
+create it
+```
+
+---
+
+# 30. Step 7 — Insert at Front
+
+```java
+newList.add(node);
+```
+
+Why the front?
+
+Because the node was just accessed.
+
+Therefore:
+
+```text
+Most Recently Used
+```
+
+inside its new frequency group.
+
+---
+
+# 31. Complete Frequency Update
+
+```java
+private void updateFrequency(Node node) {
+
+    int freq = node.freq;
+
+    DoublyLinkedList list = freqMap.get(freq);
+
+    list.remove(node);
+
+    if (freq == minFreq && list.size == 0) {
+        minFreq++;
+    }
+
+    node.freq++;
+
+    DoublyLinkedList newList =
+            freqMap.getOrDefault(
+                    node.freq,
+                    new DoublyLinkedList()
+            );
+
+    newList.add(node);
+
+    freqMap.put(node.freq, newList);
+}
+```
+
+The important mental model is:
+
+```text
+Old Group
+    ↓
+Remove
+    ↓
+Frequency + 1
+    ↓
+New Group
+    ↓
+Insert at Front
+```
+
+---
+
+# 32. Complete Example
+
+Capacity:
+
+```text
+2
+```
+
+Operations:
+
+```text
+put(1,1)
+put(2,2)
+get(1)
+put(3,3)
+get(2)
+get(3)
+put(4,4)
+```
+
+---
+
+## Operation 1
+
+```java
+put(1,1)
+```
+
+State:
+
+```text
+freq 1
+
+HEAD → [1] → TAIL
+```
+
+```text
+minFreq = 1
+```
+
+---
+
+## Operation 2
+
+```java
+put(2,2)
+```
+
+State:
+
+```text
+freq 1
+
+HEAD → [2] → [1] → TAIL
+          MRU      LRU
+```
+
+Both have:
+
+```text
+freq = 1
+```
+
+---
+
+## Operation 3
+
+```java
+get(1)
+```
+
+Before:
+
+```text
+freq 1:
+
+[2] → [1]
+```
+
+After:
+
+```text
+freq 1:
+
+[2]
+
+freq 2:
+
+[1]
+```
+
+Now:
+
+```text
+freq(1) = 2
+freq(2) = 1
+```
+
+Therefore:
+
+```text
+minFreq = 1
+```
+
+---
+
+## Operation 4
+
+```java
+put(3,3)
+```
+
+Cache is full.
+
+Minimum frequency:
+
+```text
+1
+```
+
+Frequency-1 list:
+
+```text
+[2]
+```
+
+Therefore:
+
+```text
+Evict 2
+```
+
+Then:
+
+```text
+freq 1:
+
+[3]
+
+freq 2:
+
+[1]
+```
+
+---
+
+## Operation 5
+
+```java
+get(3)
+```
+
+Node `3` moves:
+
+```text
+freq 1 → freq 2
+```
+
+Now:
+
+```text
+freq 2:
+
+[3] → [1]
+ MRU     LRU
+```
+
+Both have:
+
+```text
+frequency = 2
+```
+
+---
+
+## Operation 6
+
+```java
+put(4,4)
+```
+
+Cache is full.
+
+Both:
+
+```text
+3 → frequency 2
+1 → frequency 2
+```
+
+Tie.
+
+So use LRU.
+
+```text
+[3] → [1]
+ MRU     LRU
+```
+
+Evict:
+
+```text
+1
+```
+
+Final:
+
+```text
+freq 1:
+
+[4]
+
+freq 2:
+
+[3]
+```
+
+---
+
+# 33. Full Data Structure State
+
+At any point, the cache can conceptually look like:
+
+```text
+                  LFUCache
+                     │
+       ┌─────────────┼─────────────┐
+       │             │             │
+       ▼             ▼             ▼
+    keyMap        freqMap       minFreq
+       │             │             │
+       │             │             └── 1
+       │             │
+       │       ┌─────┴─────┐
+       │       │           │
+       ▼       ▼           ▼
+      Node    freq=1      freq=2
+       │        │           │
+       │        ▼           ▼
+       │      DLL          DLL
+       │        │           │
+       │     A ⇄ B        C ⇄ D
+       │
+       └── key → Node
+```
+
+---
+
+# 34. UML
 
 ```mermaid
 classDiagram
@@ -805,8 +1361,8 @@ classDiagram
 class LFUCache {
     -int capacity
     -int minFreq
-    -HashMap~Integer, Node~ keyMap
-    -HashMap~Integer, DoublyLinkedList~ freqMap
+    -HashMap keyMap
+    -HashMap freqMap
 
     +LFUCache(int capacity)
     +int get(int key)
@@ -835,232 +1391,420 @@ class DoublyLinkedList {
 LFUCache --> Node
 LFUCache --> DoublyLinkedList
 DoublyLinkedList --> Node
-Node --> Node : prev
-Node --> Node : next
+Node --> Node
 ```
 
 ---
 
-# 🔄 Frequency Update Flow
+# 35. Algorithm Summary
 
-```mermaid
-flowchart TD
-
-A[Access Node] --> B[Read Current Frequency]
-
-B --> C[Remove Node from Current Frequency List]
-
-C --> D{Was This minFreq?}
-
-D -->|Yes| E{Is List Empty?}
-D -->|No| F[Increase Frequency]
-
-E -->|Yes| G[Increase minFreq]
-E -->|No| F
-
-G --> F
-
-F --> H[Node Frequency + 1]
-
-H --> I[Get New Frequency List]
-
-I --> J[Insert Node at Front]
-
-J --> K[Update freqMap]
-```
-
----
-
-# 🌍 Real-World Applications
-
-LFU-style caching is useful when **frequently accessed data should remain cached**.
-
-Potential applications include:
-
-- Database caching
-- API response caching
-- Web application caching
-- Content delivery
-- Search result caching
-- Recommendation systems
-- Memory management
-- Distributed caching
-- Hot-data identification
-
-A production caching system may also combine LFU with:
+## `get(key)`
 
 ```text
-TTL
-LRU
-Admission Policies
-Memory Limits
-Sharding
-Replication
-```
-
----
-
-# 🚀 Production-Level Considerations
-
-The LeetCode implementation focuses on the required algorithm.
-
-A production LFU cache would additionally need to consider:
-
-### Thread Safety
-
-Concurrent operations require synchronization or concurrency-aware data structures.
-
----
-
-### Memory Limits
-
-A real cache needs:
-
-```text
-Maximum memory
-Maximum entries
-Eviction policies
-Monitoring
-```
-
----
-
-### Expiration
-
-Entries may expire using:
-
-```text
-TTL — Time To Live
-```
-
----
-
-### Distributed Caching
-
-A distributed LFU architecture could look like:
-
-```text
-                    Client
+                    get(key)
                        │
                        ▼
-                 Load Balancer
+                keyMap lookup
                        │
-          ┌────────────┼────────────┐
-          ▼            ▼            ▼
-       Server A     Server B     Server C
-          │            │            │
-          └────────────┼────────────┘
-                       │
-                       ▼
-                Distributed Cache
-                       │
-                       ▼
-                    Database
+                ┌──────┴──────┐
+                │             │
+              Missing       Found
+                │             │
+                ▼             ▼
+              -1        updateFrequency
+                              │
+                              ▼
+                       return value
 ```
 
-Additional distributed-system concerns:
+---
 
-- Partitioning
-- Replication
-- Consistency
-- Cache invalidation
-- Failover
-- Network latency
-- Hot keys
-- Monitoring
+## `put(key,value)`
+
+```text
+                  put(key,value)
+                        │
+                        ▼
+                 Does key exist?
+                  /           \
+                Yes            No
+                 │              │
+                 ▼              ▼
+            Update value    Is cache full?
+                 │           /       \
+                 │         Yes        No
+                 │          │          │
+                 │          ▼          │
+                 │       Evict LFU     │
+                 │          │          │
+                 └──────────┴──────────┘
+                            │
+                            ▼
+                      Create/Update
+                            │
+                            ▼
+                       Frequency = 1
+                         for new key
+                            │
+                            ▼
+                      Update minFreq
+```
 
 ---
 
-# 🎤 Interview Questions
+# 36. Complexity
 
-### 1. Why can't we implement LFU using only a HashMap?
+| Operation | Complexity |
+|---|---:|
+| Key lookup | O(1) average |
+| Frequency lookup | O(1) average |
+| Node insertion | O(1) |
+| Node removal | O(1) |
+| Frequency update | O(1) |
+| LFU eviction | O(1) |
+| `get()` | **O(1) average** |
+| `put()` | **O(1) average** |
+| Space | **O(capacity)** |
 
-A HashMap provides fast lookup but does not efficiently maintain frequency ordering and LRU tie-breaking.
-
----
-
-### 2. Why do we need a frequency map?
-
-It groups nodes by frequency so that frequency transitions and LFU eviction can happen in O(1).
-
----
-
-### 3. Why use a Doubly Linked List?
-
-It allows arbitrary node removal and insertion in O(1).
+The implementation achieves the required average-case O(1) operations through the combined data-structure design. :contentReference[oaicite:1]{index=1}
 
 ---
 
-### 4. Why do we maintain `minFreq`?
+# 37. Why the Design Works
 
-Without `minFreq`, we would need to scan frequencies to find the LFU group.
+The entire solution can be remembered using this formula:
 
-That could become O(n).
+```text
+                    LFU CACHE
+
+             ┌────────────────────┐
+             │      HashMap        │
+             │    key → Node       │
+             └─────────┬──────────┘
+                       │
+                       ▼
+             ┌────────────────────┐
+             │     freqMap        │
+             │ freq → LinkedList  │
+             └─────────┬──────────┘
+                       │
+                       ▼
+             ┌────────────────────┐
+             │ Doubly Linked List │
+             │   MRU → ... → LRU  │
+             └─────────┬──────────┘
+                       │
+                       ▼
+                 minFreq
+```
+
+So:
+
+```text
+HashMap
+    → Find key
+
+freqMap
+    → Find frequency
+
+Doubly Linked List
+    → Maintain recency
+
+minFreq
+    → Find LFU group
+```
 
 ---
 
-### 5. Why is `tail.prev` the eviction candidate?
+# 38. LRU vs LFU
 
-Within each frequency list, nodes are ordered from most recently used to least recently used.
+| Property | LRU | LFU |
+|---|---|---|
+| Eviction | Least recently used | Least frequently used |
+| Frequency tracking | No | Yes |
+| Recency tracking | Yes | Yes |
+| Tie-breaking | N/A | LRU |
+| Main structures | HashMap + DLL | HashMap + frequency map + DLL |
+| `get()` | O(1) average | O(1) average |
+| `put()` | O(1) average | O(1) average |
+| Design complexity | Medium | High |
 
-Therefore:
+The LFU design therefore extends the LRU idea by adding **frequency-based grouping and frequency transitions**. :contentReference[oaicite:2]{index=2}
+
+---
+
+# 39. Common Mistakes
+
+### Mistake 1 — Scanning all keys
+
+```text
+Find minimum frequency by looping
+```
+
+This violates O(1).
+
+### Mistake 2 — Searching the linked list
+
+Never traverse the list to find the LRU node.
+
+Use:
 
 ```java
 tail.prev
 ```
 
-is the LRU node.
+### Mistake 3 — Forgetting to update frequency
 
----
-
-### 6. What happens when a node's frequency increases?
-
-It is removed from the old frequency list and inserted at the front of the next frequency list.
-
----
-
-### 7. What happens when the minimum-frequency list becomes empty?
-
-`minFreq` is incremented because the previous minimum frequency no longer exists.
-
----
-
-### 8. What is the difference between LFU and LRU?
-
-LRU considers **when** an item was last accessed.
-
-LFU considers **how frequently** an item has been accessed.
-
----
-
-### 9. What happens when two keys have the same frequency?
-
-The least recently used key among those keys is evicted.
-
----
-
-### 10. How would you make this implementation thread-safe?
-
-Possible approaches include:
+Both:
 
 ```text
-Synchronization
-Read/Write Locks
-Concurrent Data Structures
-Segmented Locking
+get()
+put(existing key)
 ```
 
-The appropriate strategy depends on the workload.
+increase the frequency.
+
+### Mistake 4 — Forgetting the LRU tie-breaker
+
+LFU alone is not enough.
+
+The rule is:
+
+```text
+Lowest frequency
+        ↓
+If tie
+        ↓
+Least recently used
+```
+
+### Mistake 5 — Forgetting `minFreq`
+
+Without `minFreq`, identifying the LFU group may require a scan.
 
 ---
 
-# 🧪 Test Case
+# 40. Production Engineering
+
+This implementation solves the algorithmic problem.
+
+A real production cache would need additional concerns.
+
+## Thread Safety
+
+Multiple threads may call:
+
+```text
+get()
+put()
+```
+
+simultaneously.
+
+Possible solutions:
+
+```text
+synchronized blocks
+ReentrantLock
+Read/Write Locks
+Concurrent data structures
+```
+
+---
+
+## Memory Management
+
+Production caches need limits such as:
+
+```text
+Maximum entries
+Maximum memory
+TTL
+Eviction policy
+```
+
+---
+
+## Distributed Cache
+
+A distributed caching architecture could look like:
+
+```text
+Client
+   │
+   ▼
+Load Balancer
+   │
+   ├────────────┬────────────┐
+   ▼            ▼            ▼
+Server A     Server B     Server C
+   │            │            │
+   └────────────┼────────────┘
+                ▼
+        Distributed Cache
+                │
+                ▼
+             Database
+```
+
+Production concerns include:
+
+```text
+Sharding
+Replication
+Consistency
+Cache invalidation
+Failover
+Hot keys
+Network latency
+Monitoring
+```
+
+The uploaded design notes similarly identify thread safety, memory limits, TTL, distribution, partitioning, replication, consistency and cache invalidation as production concerns beyond the basic LeetCode implementation. :contentReference[oaicite:3]{index=3}
+
+---
+
+# 41. Interview Questions
+
+### Q1. Why do we need two HashMaps?
+
+Because they solve two different problems:
+
+```text
+keyMap
+→ key lookup
+
+freqMap
+→ frequency-group lookup
+```
+
+---
+
+### Q2. Why use a Doubly Linked List?
+
+To remove and insert arbitrary nodes in O(1).
+
+---
+
+### Q3. Why maintain `minFreq`?
+
+To identify the minimum frequency without scanning.
+
+---
+
+### Q4. Why is `tail.prev` the LRU node?
+
+Because the list maintains:
+
+```text
+HEAD → MRU → ... → LRU → TAIL
+```
+
+---
+
+### Q5. What happens when frequency 1 becomes empty?
+
+If:
+
+```java
+freq == minFreq
+```
+
+and the list becomes empty:
+
+```java
+minFreq++;
+```
+
+---
+
+### Q6. Why does a new node have frequency 1?
+
+Because the insertion operation counts as the first use under the problem's rules.
+
+---
+
+### Q7. What happens when an existing key is updated?
+
+Its value changes and its usage frequency increases.
+
+---
+
+### Q8. What happens when two keys have equal frequency?
+
+The LRU key within that frequency group is removed.
+
+---
+
+### Q9. Can LFU be implemented with a priority queue?
+
+Yes, conceptually, but maintaining exact frequency and recency while guaranteeing O(1) average `get()` and `put()` is the challenge. The HashMap + frequency lists design directly satisfies the required complexity.
+
+---
+
+### Q10. How would you make this production-ready?
+
+Consider:
+
+```text
+Thread safety
+TTL
+Memory limits
+Metrics
+Distributed caching
+Replication
+Sharding
+Failure handling
+Cache invalidation
+```
+
+---
+
+# 42. Java Implementation
+
+The complete implementation is available in:
+
+```text
+LFUCache.java
+```
+
+The implementation uses:
+
+```java
+HashMap<Integer, Node>
+```
+
+for direct key lookup,
+
+```java
+HashMap<Integer, DoublyLinkedList>
+```
+
+for frequency grouping,
+
+```java
+DoublyLinkedList
+```
+
+for recency management,
+
+and:
+
+```java
+minFreq
+```
+
+for constant-time LFU identification.
+
+---
+
+# 43. Test Case
 
 ### Input
 
 ```text
-["LFUCache", "put", "put", "get", "put", "get", "get",
- "put", "get", "get", "get"]
+["LFUCache","put","put","get","put","get","get",
+ "put","get","get","get"]
 ```
 
 ### Operations
@@ -1068,13 +1812,13 @@ The appropriate strategy depends on the workload.
 ```text
 capacity = 2
 
-put(1, 1)
-put(2, 2)
+put(1,1)
+put(2,2)
 get(1)
-put(3, 3)
+put(3,3)
 get(2)
 get(3)
-put(4, 4)
+put(4,4)
 get(1)
 get(3)
 get(4)
@@ -1083,64 +1827,71 @@ get(4)
 ### Output
 
 ```text
-[null, null, null, 1, null, -1, 3, null, -1, 3, 4]
+[null,null,null,1,null,-1,3,null,-1,3,4]
 ```
 
 ---
 
-# 📌 Key Takeaways
+# 44. Key Takeaways
 
-The LFU Cache demonstrates an important software engineering principle:
+The most important lesson is not the Java syntax.
 
-> **Complex performance requirements often require combining multiple specialized data structures.**
-
-This implementation combines:
+It is the design.
 
 ```text
+Requirement:
+O(1) get + O(1) put
+
+        ↓
+
 HashMap
-    +
+O(1) key lookup
+
+        +
+
 Frequency Map
-    +
-Doubly Linked Lists
-    +
-Minimum Frequency Tracking
+O(1) frequency lookup
+
+        +
+
+Doubly Linked List
+O(1) insertion/removal
+
+        +
+
+minFreq
+O(1) LFU identification
+
+        ↓
+
+Complete LFU Cache
 ```
 
-to achieve:
-
-```text
-get()  → O(1) average
-put()  → O(1) average
-```
+> **Good system design comes from choosing data structures according to the operations the system must perform efficiently.**
 
 ---
 
-# 🔗 Problem
+# 🔗 References
 
-**LeetCode:**  
-https://leetcode.com/problems/lfu-cache/
-
-**System & Software Design Quest:**  
-https://leetcode.com/quest/system-and-software-design-quest/
+- [LeetCode — LFU Cache](https://leetcode.com/problems/lfu-cache/)
+- [LeetCode — System & Software Design Quest](https://leetcode.com/quest/system-and-software-design-quest/)
 
 ---
 
-# 📚 Related Problems
+# 🔙 Navigation
 
-| # | Problem | Concept |
+| Previous | Current | Next |
 |---|---|---|
-| 01 | LRU Cache | Recency-based eviction |
-| 02 | LFU Cache | Frequency + Recency |
-| 03 | Next Design Problem | Coming Soon |
+| [01 — LRU Cache](../01-lru-cache/) | **02 — LFU Cache** | [03 — Coming Soon](../03-...) |
 
 ---
 
 <div align="center">
 
-## 🚀 System & Software Design Engineering Playbook
+### 🚀 Software Design Engineering Playbook
 
-**Design • Implement • Analyze • Scale**
+**Understand → Design → Implement → Analyze → Scale**
 
-⭐ Star the repository if you find it useful.
+⭐ **Star the repository if you find it useful.**
 
 </div>
