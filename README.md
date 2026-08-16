@@ -1,61 +1,8 @@
 # Software Design Engineering Playbook
 
-A practical engineering playbook covering **LeetCode Design Problems, Low-Level Design, High-Level Design, UML, Design Patterns, SOLID, and scalable Java architecture**.
+A structured collection of **LeetCode problems, Low-Level Design, Object-Oriented Design, SOLID principles, Design Patterns, UML, and production-oriented software engineering**.
 
-The goal is to go beyond solving problems by understanding how to design **maintainable, extensible, and production-ready software**.
-
----
-
-## Overview
-
-Each problem is treated as a software engineering case study covering:
-
-* Requirements & design decisions
-* Object-oriented design
-* SOLID principles
-* Design patterns
-* UML & sequence diagrams
-* Java implementation
-* Complexity analysis
-* Scalability considerations
-* Production-oriented architecture
-
----
-
-## Learning Path
-
-```text
-Object-Oriented Design
-        ↓
-SOLID Principles
-        ↓
-Design Patterns
-        ↓
-UML & Modeling
-        ↓
-Low-Level Design
-        ↓
-High-Level Design
-        ↓
-Scalable Architecture
-        ↓
-Production Engineering
-```
-
----
-
-## Topics
-
-| Area         | Coverage                                                                        |
-| ------------ | ------------------------------------------------------------------------------- |
-| OOP          | Encapsulation, Inheritance, Polymorphism, Composition                           |
-| SOLID        | SRP, OCP, LSP, ISP, DIP                                                         |
-| Patterns     | Factory, Builder, Strategy, Observer, Adapter, Proxy, Decorator, Command, State |
-| LLD          | Class design, interfaces, relationships, extensibility                          |
-| HLD          | Services, APIs, databases, caching, messaging, scaling                          |
-| UML          | Class, sequence and architecture diagrams                                       |
-| Architecture | Clean Architecture, DDD, MVC, layered design                                    |
-| Java         | Production-oriented implementations                                             |
+Each problem is treated as an engineering case study rather than just a coding solution.
 
 ---
 
@@ -64,94 +11,203 @@ Production Engineering
 ```text
 software-design-engineering-playbook/
 │
-├── level-01/
-│   ├── README.md
-│   ├── Solution.java
-│   ├── ClassDiagram.png
-│   ├── SequenceDiagram.png
-│   └── Notes.md
+├── 01-lru-cache/
+│   ├── 02-lfu-cache/
+│   │   └── README.md
+│   └── README.md
 │
-├── level-02/
-├── level-03/
-├── ...
+├── level-2/
+│   └── 01-kth-largest-element-in-stream/
+│       ├── 02-stream-of-characters/
+│       │   ├── README.md
+│       │   └── ...
+│       │
+│       ├── KthLargest.java
+│       └── README.md
 │
-├── assets/
-│   ├── architecture/
-│   ├── uml/
-│   └── images/
-│
+├── LICENSE
 └── README.md
 ```
 
 ---
 
-## Solution Format
+## Problems
 
-Every design problem follows a consistent structure:
+### Level 01
+
+| Problem   | Documentation                                   | Implementation                       |
+| --------- | ----------------------------------------------- | ------------------------------------ |
+| LRU Cache | [README](./01-lru-cache/README.md)              | [Open](./01-lru-cache/)              |
+| LFU Cache | [README](./01-lru-cache/02-lfu-cache/README.md) | [Open](./01-lru-cache/02-lfu-cache/) |
+
+### Level 02
+
+| Problem                         | Documentation                                                                          | Implementation                                                              |
+| ------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Kth Largest Element in a Stream | [README](./level-2/01-kth-largest-element-in-stream/README.md)                         | [Java](./level-2/01-kth-largest-element-in-stream/KthLargest.java)          |
+| Stream of Characters            | [README](./level-2/01-kth-largest-element-in-stream/02-stream-of-characters/README.md) | [Open](./level-2/01-kth-largest-element-in-stream/02-stream-of-characters/) |
+
+---
+
+## Engineering Approach
+
+Every problem is studied through multiple layers:
+
+```text
+Problem
+   ↓
+Requirements
+   ↓
+Object-Oriented Design
+   ↓
+SOLID Principles
+   ↓
+Design Patterns
+   ↓
+UML / Sequence Diagrams
+   ↓
+Java Implementation
+   ↓
+Complexity Analysis
+   ↓
+Scalability & Trade-offs
+```
+
+---
+
+## What This Repository Covers
+
+### Software Design
+
+* Object-Oriented Programming
+* Encapsulation
+* Abstraction
+* Inheritance
+* Polymorphism
+* Composition
+* Dependency Injection
+
+### Design Principles
+
+* SOLID
+* DRY
+* KISS
+* Separation of Concerns
+* High Cohesion
+* Low Coupling
+
+### Design Patterns
+
+* Factory
+* Builder
+* Singleton
+* Strategy
+* Observer
+* Adapter
+* Decorator
+* Proxy
+* Command
+* State
+* Template Method
+
+### System Design
+
+* Low-Level Design
+* High-Level Design
+* API Design
+* Database Design
+* Caching
+* Messaging
+* Load Balancing
+* Scalability
+* Fault Tolerance
+* Distributed Systems
+
+---
+
+## Solution Structure
+
+Each problem is documented using a consistent engineering format:
 
 ```text
 Problem
 Requirements
 Design
-UML
+Class Diagram
+Sequence Diagram
 Implementation
 Complexity
 Design Decisions
 Scalability
-Improvements
+Trade-offs
 Interview Questions
 ```
 
-This keeps each solution useful for both **learning and interview preparation**.
+This makes every solution useful for both **learning and technical interview preparation**.
 
 ---
 
-## Engineering Focus
+## Technology
 
-This repository emphasizes:
-
-* Maintainability
-* Extensibility
-* Separation of concerns
-* Loose coupling
-* Reusable abstractions
-* Scalability
-* Production-oriented thinking
+| Technology | Purpose               |
+| ---------- | --------------------- |
+| Java       | Implementation        |
+| UML        | System modeling       |
+| Mermaid    | Diagrams              |
+| Draw.io    | Architecture diagrams |
+| Markdown   | Documentation         |
 
 ---
 
-## Tech Stack
+## Design Philosophy
 
-`Java` · `UML` · `Mermaid` · `Draw.io` · `Markdown`
+The objective is to move from:
 
----
+```text
+Writing Code
+     ↓
+Designing Components
+     ↓
+Understanding Trade-offs
+     ↓
+Designing Systems
+     ↓
+Building Production-Ready Software
+```
 
-## Progress
-
-| Stage                   | Status      |
-| ----------------------- | ----------- |
-| Design Fundamentals     | Complete    |
-| OOP & SOLID             | Complete    |
-| Design Patterns         | Complete    |
-| LLD                     | In Progress |
-| HLD                     | In Progress |
-| Production Architecture | Planned     |
+The repository focuses on **engineering decisions, not just accepted solutions**.
 
 ---
 
 ## Goals
 
-* Build strong LLD and HLD fundamentals
-* Solve design-oriented LeetCode problems systematically
-* Develop production-quality Java implementations
-* Strengthen software architecture skills
+* Build strong LLD fundamentals
+* Master practical software design principles
+* Apply design patterns to real problems
+* Improve Java design and implementation skills
+* Develop HLD and system-design thinking
+* Understand scalability and architectural trade-offs
 * Build an interview-ready engineering portfolio
+
+---
+
+## Progress
+
+| Area                      | Status      |
+| ------------------------- | ----------- |
+| OOP & Design Fundamentals | In Progress |
+| SOLID Principles          | In Progress |
+| Design Patterns           | In Progress |
+| UML & Modeling            | In Progress |
+| Low-Level Design          | In Progress |
+| High-Level Design         | Planned     |
+| Production Architecture   | Planned     |
 
 ---
 
 ## License
 
-MIT License
+This project is licensed under the [MIT License](./LICENSE).
 
 ---
 
@@ -159,6 +215,6 @@ MIT License
 
 **Software Design Engineering Playbook**
 
-Designed to learn. Built to scale.
+*Design systems. Understand trade-offs. Build for scale.*
 
 </div>
