@@ -1,260 +1,155 @@
-# software-design-engineering-playbook
-LeetCode System &amp; Software Design Quest featuring HLD, LLD, UML diagrams, SOLID principles, Design Patterns, Java implementations, architecture diagrams, scalability discussions, and production-grade system design explanations.
-# 🚀 LeetCode System & Software Design Quest
+# Software Design Engineering Playbook
 
-<div align="center">
+A practical engineering playbook covering **LeetCode Design Problems, Low-Level Design, High-Level Design, UML, Design Patterns, SOLID, and scalable Java architecture**.
 
-![GitHub stars](https://img.shields.io/github/stars/Ammar1Ahmad/leetcode-system-software-design-quest?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/Ammar1Ahmad/leetcode-system-software-design-quest?style=for-the-badge)
-![GitHub repo size](https://img.shields.io/github/repo-size/Ammar1Ahmad/leetcode-system-software-design-quest?style=for-the-badge)
-![GitHub last commit](https://img.shields.io/github/last-commit/Ammar1Ahmad/leetcode-system-software-design-quest?style=for-the-badge)
-![Java](https://img.shields.io/badge/Language-Java-orange?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
-
-</div>
+The goal is to go beyond solving problems by understanding how to design **maintainable, extensible, and production-ready software**.
 
 ---
 
-## 📖 About
+## Overview
 
-This repository contains my complete solutions for the **LeetCode System & Software Design Quest**.
+Each problem is treated as a software engineering case study covering:
 
-Instead of simply uploading code, every solution is explained from a real Software Engineering perspective.
-
-Each level contains
-
-- ✅ Problem Statement
-- ✅ Requirements Analysis
-- ✅ Object-Oriented Design
-- ✅ SOLID Principles
-- ✅ Design Patterns
-- ✅ UML Class Diagram
-- ✅ Sequence Diagram
-- ✅ Java Solution
-- ✅ Complexity Analysis
-- ✅ Scalability Discussion
-- ✅ Real-world Architecture
-
-The goal is to build strong Software Design fundamentals for Backend, Cloud and Distributed Systems interviews.
+* Requirements & design decisions
+* Object-oriented design
+* SOLID principles
+* Design patterns
+* UML & sequence diagrams
+* Java implementation
+* Complexity analysis
+* Scalability considerations
+* Production-oriented architecture
 
 ---
 
-# 🎯 Learning Objectives
+## Learning Path
 
-✔ Object-Oriented Programming
-
-✔ SOLID Principles
-
-✔ Clean Code
-
-✔ Low-Level Design (LLD)
-
-✔ High-Level Design (HLD)
-
-✔ UML Modeling
-
-✔ Design Patterns
-
-✔ Scalable Architecture
-
-✔ Production Ready Code
-
-✔ Interview Preparation
-
----
-
-# 📂 Repository Structure
-
+```text
+Object-Oriented Design
+        ↓
+SOLID Principles
+        ↓
+Design Patterns
+        ↓
+UML & Modeling
+        ↓
+Low-Level Design
+        ↓
+High-Level Design
+        ↓
+Scalable Architecture
+        ↓
+Production Engineering
 ```
-leetcode-system-software-design-quest
 
+---
+
+## Topics
+
+| Area         | Coverage                                                                        |
+| ------------ | ------------------------------------------------------------------------------- |
+| OOP          | Encapsulation, Inheritance, Polymorphism, Composition                           |
+| SOLID        | SRP, OCP, LSP, ISP, DIP                                                         |
+| Patterns     | Factory, Builder, Strategy, Observer, Adapter, Proxy, Decorator, Command, State |
+| LLD          | Class design, interfaces, relationships, extensibility                          |
+| HLD          | Services, APIs, databases, caching, messaging, scaling                          |
+| UML          | Class, sequence and architecture diagrams                                       |
+| Architecture | Clean Architecture, DDD, MVC, layered design                                    |
+| Java         | Production-oriented implementations                                             |
+
+---
+
+## Repository Structure
+
+```text
+software-design-engineering-playbook/
 │
-
-├── Level-01
-
-│ ├── README.md
-
-│ ├── Solution.java
-
-│ ├── ClassDiagram.png
-
-│ ├── SequenceDiagram.png
-
-│ └── Notes.md
-
+├── level-01/
+│   ├── README.md
+│   ├── Solution.java
+│   ├── ClassDiagram.png
+│   ├── SequenceDiagram.png
+│   └── Notes.md
 │
-
-├── Level-02
-
-├── Level-03
-
-├── Level-04
-
-...
-
-├── Level-35
-
+├── level-02/
+├── level-03/
+├── ...
 │
-
-├── Assets
-
-│ ├── Images
-
-│ ├── UML
-
-│ └── Architecture
-
+├── assets/
+│   ├── architecture/
+│   ├── uml/
+│   └── images/
 │
-
 └── README.md
 ```
 
 ---
 
-# 📚 Topics Covered
+## Solution Format
 
-- Object-Oriented Design
-- SOLID Principles
-- Encapsulation
-- Inheritance
-- Polymorphism
-- Composition
-- Aggregation
-- Dependency Injection
-- Factory Pattern
-- Builder Pattern
-- Singleton
-- Strategy Pattern
-- Observer Pattern
-- Decorator
-- Adapter
-- Proxy
-- Command Pattern
-- State Pattern
-- Template Method
-- MVC Architecture
-- UML Diagrams
-- Software Architecture
-- Clean Architecture
-- Domain Driven Design
+Every design problem follows a consistent structure:
 
----
-
-# 📈 Progress
-
-| Level | Status |
-|--------|--------|
-| Level 1 | ✅ |
-| Level 2 | ✅ |
-| Level 3 | ✅ |
-| Level 4 | ✅ |
-| Level 5 | ✅ |
-| ... | ... |
-| Level 35 | 🚧 |
-
----
-
-# 📑 Solution Format
-
-Every solution follows the same professional template.
-
-```
-
+```text
 Problem
-
 Requirements
-
-Class Design
-
-UML Diagram
-
-Java Solution
-
+Design
+UML
+Implementation
 Complexity
-
 Design Decisions
-
-Possible Improvements
-
+Scalability
+Improvements
 Interview Questions
-
 ```
 
----
-
-# 🏗 Example Solution Structure
-
-```
-
-Level-05/
-
-│
-
-├── README.md
-
-├── Solution.java
-
-├── UML.png
-
-├── SequenceDiagram.png
-
-└── Notes.md
-
-```
+This keeps each solution useful for both **learning and interview preparation**.
 
 ---
 
-# 💡 Why This Repository?
+## Engineering Focus
 
-Unlike traditional solution repositories, this project focuses on
+This repository emphasizes:
 
-- Software Engineering
-- Architecture Thinking
-- Maintainability
-- Scalability
-- Production-quality Design
-
-making it valuable for
-
-- Software Engineer
-- Backend Engineer
-- Java Developer
-- Cloud Engineer
-- DevOps Engineer
-- System Design Interviews
+* Maintainability
+* Extensibility
+* Separation of concerns
+* Loose coupling
+* Reusable abstractions
+* Scalability
+* Production-oriented thinking
 
 ---
 
-# 🛠 Tech Stack
+## Tech Stack
 
-- Java
-- Object-Oriented Programming
-- UML
-- Draw.io
-- Mermaid
-- Markdown
+`Java` · `UML` · `Mermaid` · `Draw.io` · `Markdown`
 
 ---
 
-# ⭐ Repository Goals
+## Progress
 
-- Complete all LeetCode Design Quest levels
-- Write production-quality Java code
-- Learn Software Engineering principles
-- Practice scalable software design
-- Build an interview-ready portfolio
-
----
-
-# 🤝 Contributions
-
-Contributions, improvements and discussions are always welcome.
-
-Feel free to open an Issue or Pull Request.
+| Stage                   | Status      |
+| ----------------------- | ----------- |
+| Design Fundamentals     | Complete    |
+| OOP & SOLID             | Complete    |
+| Design Patterns         | Complete    |
+| LLD                     | In Progress |
+| HLD                     | In Progress |
+| Production Architecture | Planned     |
 
 ---
 
-# 📄 License
+## Goals
+
+* Build strong LLD and HLD fundamentals
+* Solve design-oriented LeetCode problems systematically
+* Develop production-quality Java implementations
+* Strengthen software architecture skills
+* Build an interview-ready engineering portfolio
+
+---
+
+## License
 
 MIT License
 
@@ -262,8 +157,8 @@ MIT License
 
 <div align="center">
 
-### ⭐ If this repository helps you, consider giving it a Star!
+**Software Design Engineering Playbook**
 
-**Happy Coding 🚀**
+Designed to learn. Built to scale.
 
 </div>
