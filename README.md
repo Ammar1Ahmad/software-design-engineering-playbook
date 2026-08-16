@@ -1,220 +1,270 @@
-# Software Design Engineering Playbook
+# software-design-engineering-playbook
+LeetCode System &amp; Software Design Quest featuring HLD, LLD, UML diagrams, SOLID principles, Design Patterns, Java implementations, architecture diagrams, scalability discussions, and production-grade system design explanations.
+# 🚀 LeetCode System & Software Design Quest
 
-A structured collection of **LeetCode problems, Low-Level Design, Object-Oriented Design, SOLID principles, Design Patterns, UML, and production-oriented software engineering**.
+<div align="center">
 
-Each problem is treated as an engineering case study rather than just a coding solution.
+![GitHub stars](https://img.shields.io/github/stars/Ammar1Ahmad/leetcode-system-software-design-quest?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/Ammar1Ahmad/leetcode-system-software-design-quest?style=for-the-badge)
+![GitHub repo size](https://img.shields.io/github/repo-size/Ammar1Ahmad/leetcode-system-software-design-quest?style=for-the-badge)
+![GitHub last commit](https://img.shields.io/github/last-commit/Ammar1Ahmad/leetcode-system-software-design-quest?style=for-the-badge)
+![Java](https://img.shields.io/badge/Language-Java-orange?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+
+</div>
 
 ---
 
-## Repository Structure
+## 📖 About
 
-```text
-software-design-engineering-playbook/
+This repository contains my complete solutions for the **LeetCode System & Software Design Quest**.
+
+Instead of simply uploading code, every solution is explained from a real Software Engineering perspective.
+
+Each level contains
+
+- ✅ Problem Statement
+- ✅ Requirements Analysis
+- ✅ Object-Oriented Design
+- ✅ SOLID Principles
+- ✅ Design Patterns
+- ✅ UML Class Diagram
+- ✅ Sequence Diagram
+- ✅ Java Solution
+- ✅ Complexity Analysis
+- ✅ Scalability Discussion
+- ✅ Real-world Architecture
+
+The goal is to build strong Software Design fundamentals for Backend, Cloud and Distributed Systems interviews.
+
+---
+
+# 🎯 Learning Objectives
+
+✔ Object-Oriented Programming
+
+✔ SOLID Principles
+
+✔ Clean Code
+
+✔ Low-Level Design (LLD)
+
+✔ High-Level Design (HLD)
+
+✔ UML Modeling
+
+✔ Design Patterns
+
+✔ Scalable Architecture
+
+✔ Production Ready Code
+
+✔ Interview Preparation
+
+---
+
+# 📂 Repository Structure
+
+```
+leetcode-system-software-design-quest
+
 │
-├── 01-lru-cache/
-│   ├── 02-lfu-cache/
-│   │   └── README.md
-│   └── README.md
+
+├── Level-01
+
+│ ├── README.md
+
+│ ├── Solution.java
+
+│ ├── ClassDiagram.png
+
+│ ├── SequenceDiagram.png
+
+│ └── Notes.md
+
 │
-├── level-2/
-│   └── 01-kth-largest-element-in-stream/
-│       ├── 02-stream-of-characters/
-│       │   ├── README.md
-│       │   └── ...
-│       │
-│       ├── KthLargest.java
-│       └── README.md
+
+├── Level-02
+
+├── Level-03
+
+├── Level-04
+
+...
+
+├── Level-35
+
 │
-├── LICENSE
+
+├── Assets
+
+│ ├── Images
+
+│ ├── UML
+
+│ └── Architecture
+
+│
+
 └── README.md
 ```
 
 ---
 
-## Problems
+# 📚 Topics Covered
 
-### Level 01
-
-| Problem   | Documentation                                   | Implementation                       |
-| --------- | ----------------------------------------------- | ------------------------------------ |
-| LRU Cache | [README](./01-lru-cache/README.md)              | [Open](./01-lru-cache/)              |
-| LFU Cache | [README](./01-lru-cache/02-lfu-cache/README.md) | [Open](./01-lru-cache/02-lfu-cache/) |
-
-### Level 02
-
-| Problem                         | Documentation                                                                          | Implementation                                                              |
-| ------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Kth Largest Element in a Stream | [README](./level-2/01-kth-largest-element-in-stream/README.md)                         | [Java](./level-2/01-kth-largest-element-in-stream/KthLargest.java)          |
-| Stream of Characters            | [README](./level-2/01-kth-largest-element-in-stream/02-stream-of-characters/README.md) | [Open](./level-2/01-kth-largest-element-in-stream/02-stream-of-characters/) |
+- Object-Oriented Design
+- SOLID Principles
+- Encapsulation
+- Inheritance
+- Polymorphism
+- Composition
+- Aggregation
+- Dependency Injection
+- Factory Pattern
+- Builder Pattern
+- Singleton
+- Strategy Pattern
+- Observer Pattern
+- Decorator
+- Adapter
+- Proxy
+- Command Pattern
+- State Pattern
+- Template Method
+- MVC Architecture
+- UML Diagrams
+- Software Architecture
+- Clean Architecture
+- Domain Driven Design
 
 ---
 
-## Engineering Approach
+# 📈 Progress
 
-Every problem is studied through multiple layers:
+| Level | Status |
+|--------|--------|
+| Level 1 | ✅ |
+| Level 2 | ✅ |
+| Level 3 | ✅ |
+| Level 4 | ✅ |
+| Level 5 | ✅ |
+| ... | ... |
+| Level 35 | 🚧 |
 
-```text
-Problem
-   ↓
-Requirements
-   ↓
-Object-Oriented Design
-   ↓
-SOLID Principles
-   ↓
-Design Patterns
-   ↓
-UML / Sequence Diagrams
-   ↓
-Java Implementation
-   ↓
-Complexity Analysis
-   ↓
-Scalability & Trade-offs
+---
+
+# 📑 Solution Format
+
+Every solution follows the same professional template.
+
 ```
 
----
-
-## What This Repository Covers
-
-### Software Design
-
-* Object-Oriented Programming
-* Encapsulation
-* Abstraction
-* Inheritance
-* Polymorphism
-* Composition
-* Dependency Injection
-
-### Design Principles
-
-* SOLID
-* DRY
-* KISS
-* Separation of Concerns
-* High Cohesion
-* Low Coupling
-
-### Design Patterns
-
-* Factory
-* Builder
-* Singleton
-* Strategy
-* Observer
-* Adapter
-* Decorator
-* Proxy
-* Command
-* State
-* Template Method
-
-### System Design
-
-* Low-Level Design
-* High-Level Design
-* API Design
-* Database Design
-* Caching
-* Messaging
-* Load Balancing
-* Scalability
-* Fault Tolerance
-* Distributed Systems
-
----
-
-## Solution Structure
-
-Each problem is documented using a consistent engineering format:
-
-```text
 Problem
+
 Requirements
-Design
-Class Diagram
-Sequence Diagram
-Implementation
+
+Class Design
+
+UML Diagram
+
+Java Solution
+
 Complexity
+
 Design Decisions
-Scalability
-Trade-offs
+
+Possible Improvements
+
 Interview Questions
+
 ```
 
-This makes every solution useful for both **learning and technical interview preparation**.
-
 ---
 
-## Technology
+# 🏗 Example Solution Structure
 
-| Technology | Purpose               |
-| ---------- | --------------------- |
-| Java       | Implementation        |
-| UML        | System modeling       |
-| Mermaid    | Diagrams              |
-| Draw.io    | Architecture diagrams |
-| Markdown   | Documentation         |
-
----
-
-## Design Philosophy
-
-The objective is to move from:
-
-```text
-Writing Code
-     ↓
-Designing Components
-     ↓
-Understanding Trade-offs
-     ↓
-Designing Systems
-     ↓
-Building Production-Ready Software
 ```
 
-The repository focuses on **engineering decisions, not just accepted solutions**.
+Level-05/
+
+│
+
+├── README.md
+
+├── Solution.java
+
+├── UML.png
+
+├── SequenceDiagram.png
+
+└── Notes.md
+
+```
 
 ---
 
-## Goals
+# 💡 Why This Repository?
 
-* Build strong LLD fundamentals
-* Master practical software design principles
-* Apply design patterns to real problems
-* Improve Java design and implementation skills
-* Develop HLD and system-design thinking
-* Understand scalability and architectural trade-offs
-* Build an interview-ready engineering portfolio
+Unlike traditional solution repositories, this project focuses on
 
----
+- Software Engineering
+- Architecture Thinking
+- Maintainability
+- Scalability
+- Production-quality Design
 
-## Progress
+making it valuable for
 
-| Area                      | Status      |
-| ------------------------- | ----------- |
-| OOP & Design Fundamentals | In Progress |
-| SOLID Principles          | In Progress |
-| Design Patterns           | In Progress |
-| UML & Modeling            | In Progress |
-| Low-Level Design          | In Progress |
-| High-Level Design         | Planned     |
-| Production Architecture   | Planned     |
+- Software Engineer
+- Backend Engineer
+- Java Developer
+- Cloud Engineer
+- DevOps Engineer
+- System Design Interviews
 
 ---
 
-## License
+# 🛠 Tech Stack
 
-This project is licensed under the [MIT License](./LICENSE).
+- Java
+- Object-Oriented Programming
+- UML
+- Draw.io
+- Mermaid
+- Markdown
+
+---
+
+# ⭐ Repository Goals
+
+- Complete all LeetCode Design Quest levels
+- Write production-quality Java code
+- Learn Software Engineering principles
+- Practice scalable software design
+- Build an interview-ready portfolio
+
+---
+
+# 🤝 Contributions
+
+Contributions, improvements and discussions are always welcome.
+
+Feel free to open an Issue or Pull Request.
+
+---
+
+# 📄 License
+
+MIT License
 
 ---
 
 <div align="center">
 
-**Software Design Engineering Playbook**
+### ⭐ If this repository helps you, consider giving it a Star!
 
-*Design systems. Understand trade-offs. Build for scale.*
+**Happy Coding 🚀**
 
 </div>
+
